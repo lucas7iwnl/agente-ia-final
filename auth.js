@@ -1,3 +1,4 @@
+// A sua configuração do Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDHVQd_To0ihQzbxcX2_zUJ9pnh3snhR5M",
     authDomain: "plataforma-agenteis-ia.firebaseapp.com",
@@ -11,6 +12,7 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+// Lógica para a PÁGINA DE LOGIN (index.html)
 if (document.getElementById('login-btn')) {
     const loginButton = document.getElementById('login-btn');
     const emailInput = document.getElementById('email-input');
@@ -30,10 +32,11 @@ if (document.getElementById('login-btn')) {
     });
 }
 
+// Lógica para as páginas que precisam de logout (dashboard, agente)
 if (document.getElementById('logout-btn')) {
     const logoutButton = document.getElementById('logout-btn');
     logoutButton.addEventListener('click', () => {
-        localStorage.removeItem('selectedAgentId'); 
+        localStorage.removeItem('selectedAgentId');
         auth.signOut().then(() => window.location.href = 'index.html');
     });
 }

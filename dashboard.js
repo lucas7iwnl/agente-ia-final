@@ -18,7 +18,7 @@ async function loadUserAgents(user) {
         }
 
         const permittedAgentIds = userDoc.data().agentesPermitidos;
-        agentListDiv.innerHTML = ''; 
+        agentListDiv.innerHTML = '';
 
         for (const agentId of permittedAgentIds) {
             const agentRef = db.collection('agents').doc(agentId);
