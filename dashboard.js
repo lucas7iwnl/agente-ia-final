@@ -1,25 +1,44 @@
 auth.onAuthStateChanged(user => {
     if (user) {
-        // O utilizador está logado, vamos mostrar o agente.
-        loadHardcodedAgent();
+        loadUserAgents(user);
     } else {
         window.location.href = 'index.html';
     }
 });
 
-function loadHardcodedAgent() {
+async function loadUserAgents(user) {
     const agentListDiv = document.getElementById('agent-list');
-    agentListDiv.innerHTML = ''; // Limpa a mensagem "A carregar..."
+    try {
+        const userRef = db.collection('users').doc(user.uid);
+        const userDoc = await userRef.get();
 
-    // Criamos o botão diretamente, sem ler o banco de dados
-    const agentButton = document.createElement('button');
-    agentButton.textContent = 'Aceder ao Detetive de Competências';
-    agentButton.classList.add('agent-button');
-    agentButton.style.marginTop = '15px';
-    agentButton.onclick = () => {
-        // Guardamos o ID do agente que o backend espera
-        localStorage.setItem('selectedAgentId', 'corretor-enem');
-        window.location.href = 'agente.html';
-    };
-    agentListDiv.appendChild(agentButton);
+        if (!userDoc.exists || !userDoc.data().agentesPermitidos || userDoc.data().agentesPermitidos.length === 0) {
+            agentListDiv.innerHTML = '<p>Você ainda não tem acesso a nenhum agente.</p>';
+            return;
+        }
+
+        const permittedAgentIds = userDoc.data().agentesPermitidos;
+        agentListDiv.innerHTML = ''; 
+
+        for (const agentId of permittedAgentIds) {
+            const agentRef = db.collection('agents').doc(agentId);
+            const agentDoc = await agentRef.get();
+
+            if (agentDoc.exists) {
+                const agentData = agentDoc.data();
+                const agentButton = document.createElement('button');
+                agentButton.textContent = `Aceder ao ${agentData.name}`;
+                agentButton.classList.add('agent-button');
+                agentButton.style.marginTop = '15px';
+                agentButton.onclick = () => {
+                    localStorage.setItem('selectedAgentId', agentId);
+                    window.location.href = 'agente.html';
+                };
+                agentListDiv.appendChild(agentButton);
+            }
+        }
+    } catch (error) {
+        console.error("Erro ao carregar agentes:", error);
+        agentListDiv.innerHTML = '<p>Ocorreu um erro ao carregar os seus agentes.</p>';
+    }
 }
