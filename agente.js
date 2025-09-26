@@ -12,7 +12,7 @@ async function initializeChat(user) {
     const messageInput = document.getElementById('message-input');
     const chatMessages = document.getElementById('chat-messages');
 
-    let agentPrompt = null; // Vamos guardar o prompt do agente aqui
+    let agentPrompt = null;
 
     const selectedAgentId = localStorage.getItem('selectedAgentId');
     if (!selectedAgentId) {
@@ -21,6 +21,7 @@ async function initializeChat(user) {
         return;
     }
     
+    // O URL do seu backend na Google Cloud
     const agentApiUrl = 'https://meu-agente-ia-229126335565.southamerica-east1.run.app/meuAgenteIA';
 
     try {
@@ -30,7 +31,7 @@ async function initializeChat(user) {
         
         const agentData = agentDoc.data();
         agentNameTitle.textContent = agentData.name;
-        agentPrompt = agentData.prompt; // Guardamos o cérebro do agente
+        agentPrompt = agentData.prompt;
         
         addMessage(`Olá! Eu sou ${agentData.name}. Como posso ajudar?`, 'agent');
         
@@ -65,7 +66,6 @@ async function initializeChat(user) {
         try {
             const idToken = await user.getIdToken();
             
-            // Agora enviamos o prompt específico do agente para o backend
             const finalPrompt = `${agentPrompt}\n\nAQUI ESTÁ A MENSAGEM DO UTILIZADOR:\n\n---\n\n${messageText}`;
 
             const response = await fetch(agentApiUrl, {
@@ -74,7 +74,7 @@ async function initializeChat(user) {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${idToken}`
                 },
-                body: JSON.stringify({ mensagem: finalPrompt }) // Enviamos o prompt completo
+                body: JSON.stringify({ mensagem: finalPrompt })
             });
 
             if (!response.ok) {

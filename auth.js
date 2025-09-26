@@ -1,6 +1,5 @@
 // **ATENÇÃO: COLE A SUA CONFIGURAÇÃO DO FIREBASE AQUI EM BAIXO**
 const firebaseConfig = {
-    // As suas chaves do Firebase vão aqui
     apiKey: "AIzaSyDHVQd_To0ihQzbxcX2_zUJ9pnh3snhR5M",
     authDomain: "plataforma-agenteis-ia.firebaseapp.com",
     projectId: "plataforma-agenteis-ia",
@@ -34,7 +33,7 @@ if (document.getElementById('login-btn')) {
     });
 }
 
-// Lógica para as páginas que precisam de logout (dashboard, chat)
+// Lógica para as páginas que precisam de logout (dashboard, agente)
 if (document.getElementById('logout-btn')) {
     const logoutButton = document.getElementById('logout-btn');
     logoutButton.addEventListener('click', () => {

@@ -32,7 +32,6 @@ async function loadUserAgents(user) {
                 agentButton.style.marginTop = '15px';
                 agentButton.onclick = () => {
                     localStorage.setItem('selectedAgentId', agentId);
-                    // A alteração está aqui: agora vai para agente.html
                     window.location.href = 'agente.html'; 
                 };
                 agentListDiv.appendChild(agentButton);
