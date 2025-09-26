@@ -10,35 +10,18 @@ async function initializeChat(user) {
     const agentNameTitle = document.getElementById('agent-name');
     const sendBtn = document.getElementById('send-btn');
     const messageInput = document.getElementById('message-input');
-    const chatMessages = document.getElementById('chat-messages');
-
-    let agentPrompt = null;
-
-    const selectedAgentId = localStorage.getItem('selectedAgentId');
-    if (!selectedAgentId) {
-        alert("Nenhum agente selecionado. A redirecionar...");
-        window.location.href = 'dashboard.html';
-        return;
-    }
     
     // O URL do seu backend na Google Cloud
     const agentApiUrl = 'https://meu-agente-ia-229126335565.southamerica-east1.run.app/meuAgenteIA';
 
-    try {
-        const agentRef = db.collection('agents').doc(selectedAgentId);
-        const agentDoc = await agentRef.get();
-        if (!agentDoc.exists) throw new Error('Agente não encontrado no banco de dados.');
-        
-        const agentData = agentDoc.data();
-        agentNameTitle.textContent = agentData.name;
-        agentPrompt = agentData.prompt;
-        
-        addMessage(`Olá! Eu sou ${agentData.name}. Como posso ajudar?`, 'agent');
-        
-    } catch (error) {
-        console.error(error);
-        agentNameTitle.textContent = "Erro ao carregar";
-    }
+    // --- INFORMAÇÃO DO AGENTE (SIMPLIFICADO) ---
+    // Em vez de ler do DB, colocamos a informação aqui
+    const agentName = "Detetive de Competências";
+    const agentPrompt = `Aja como o "Detetive de Competências", um especialista sênior e tutor de redação do ENEM. Seu tom deve ser encorajador e didático. Sua missão é fornecer clareza total ao aluno... (coloque o seu prompt completo aqui se quiser, ou deixe um simples para teste)`;
+    
+    agentNameTitle.textContent = agentName;
+    addMessage(`Olá! Eu sou ${agentName}. Como posso ajudar?`, 'agent');
+    // --- FIM DA SIMPLIFICAÇÃO ---
 
     sendBtn.addEventListener('click', handleSendMessage);
     messageInput.addEventListener('keydown', (event) => {
@@ -49,11 +32,6 @@ async function initializeChat(user) {
     });
 
     async function handleSendMessage() {
-        if (!agentPrompt) {
-            addMessage('O cérebro do agente não foi carregado. Tente recarregar a página.', 'agent-error');
-            return;
-        }
-
         const messageText = messageInput.value.trim();
         if (messageText.length === 0) return;
 
@@ -66,14 +44,11 @@ async function initializeChat(user) {
         try {
             const idToken = await user.getIdToken();
             
-            const finalPrompt = `${agentPrompt}\n\nAQUI ESTÁ A MENSAGEM DO UTILIZADOR:\n\n---\n\n${messageText}`;
+            const finalPrompt = `${agentPrompt}\n\nMensagem do Utilizador: ${messageText}`;
 
             const response = await fetch(agentApiUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${idToken}`
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
                 body: JSON.stringify({ mensagem: finalPrompt })
             });
 
@@ -90,7 +65,7 @@ async function initializeChat(user) {
         } catch (error) {
             console.error(error);
             chatMessages.removeChild(typingIndicator);
-            addMessage('Desculpe, ocorreu um erro na comunicação com a IA. Tente novamente.', 'agent-error');
+            addMessage('Desculpe, ocorreu um erro na comunicação com a IA.', 'agent-error');
         } finally {
             sendBtn.disabled = false;
         }
