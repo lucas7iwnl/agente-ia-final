@@ -10,6 +10,9 @@
     --error-color: #e74c3c;
     --history-color: #7f8c8d;
     --delete-color: #c0392b;
+    /* ADICIONADO: Cores para o botão de admin */
+    --admin-color: #f39c12;
+    --admin-hover-color: #e67e22;
 }
 
 body {
@@ -239,4 +242,16 @@ button:disabled {
     color: var(--error-color);
     transform: scale(1.1);
     box-shadow: none;
+}
+
+/* ADICIONADO: Estilos para o botão de admin */
+#admin-panel-btn {
+    width: auto;
+    padding: 8px 15px;
+    font-size: 14px;
+    background-color: var(--admin-color);
+}
+
+#admin-panel-btn:hover {
+    background-color: var(--admin-hover-color);
 }
