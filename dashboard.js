@@ -1,4 +1,4 @@
-// dashboard.js - VERSÃO COM BOTÃO DE EXCLUIR
+// dashboard.js - VERSÃO COMPLETA E CORRIGIDA
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -90,4 +90,34 @@ async function loadChatHistory(user) {
             };
 
             const deleteButton = document.createElement('button');
-            deleteButton.innerHTML = '&#12
+            deleteButton.innerHTML = '&#128465;'; // Ícone de lixeira
+            deleteButton.classList.add('delete-btn');
+            deleteButton.title = 'Excluir conversa';
+            deleteButton.onclick = (event) => {
+                event.stopPropagation();
+                deleteChat(user, chatId, historyItemDiv);
+            };
+
+            historyItemDiv.appendChild(historyButton);
+            historyItemDiv.appendChild(deleteButton);
+            historyListDiv.appendChild(historyItemDiv);
+        });
+
+    } catch (error) {
+        console.error("Erro ao carregar histórico de conversas:", error);
+        historyListDiv.innerHTML = '<p>Ocorreu um erro ao carregar seu histórico.</p>';
+    }
+}
+
+async function deleteChat(user, chatId, elementToRemove) {
+    if (confirm("Tem certeza de que deseja excluir esta conversa? Esta ação não pode ser desfeita.")) {
+        try {
+            const chatRef = db.collection('users').doc(user.uid).collection('chats').doc(chatId);
+            await chatRef.delete();
+            elementToRemove.remove();
+        } catch (error) {
+            console.error("Erro ao excluir conversa:", error);
+            alert("Não foi possível excluir a conversa. Tente novamente.");
+        }
+    }
+}

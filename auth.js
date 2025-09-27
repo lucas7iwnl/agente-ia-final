@@ -1,4 +1,4 @@
-// auth.js - VERSÃO COM LOGIN POR ENTER
+// auth.js - VERSÃO CORRIGIDA
 
 // A sua configuração do Firebase
 const firebaseConfig = {
@@ -21,7 +21,6 @@ if (document.getElementById('login-btn')) {
     const passwordInput = document.getElementById('password-input');
     const errorMessage = document.getElementById('error-message');
 
-    // Função de login para ser reutilizada
     const handleLogin = () => {
         const email = emailInput.value;
         const password = passwordInput.value;
@@ -34,10 +33,8 @@ if (document.getElementById('login-btn')) {
             .catch(error => errorMessage.textContent = 'Email ou senha inválidos.');
     };
 
-    // Ação de clique
     loginButton.addEventListener('click', handleLogin);
 
-    // AÇÃO PARA A TECLA ENTER
     passwordInput.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             handleLogin();

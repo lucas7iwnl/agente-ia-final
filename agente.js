@@ -1,4 +1,4 @@
-// agente.js - VERSÃO COM BOTÃO VOLTAR
+// agente.js - VERSÃO COMPLETA E CORRIGIDA
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -57,7 +57,6 @@ async function initializeChat(user) {
         }
     });
 
-    // NOVO BLOCO PARA O BOTÃO VOLTAR
     const backBtn = document.getElementById('back-dashboard-btn');
     backBtn.addEventListener('click', () => {
         window.location.href = 'dashboard.html';
@@ -72,9 +71,61 @@ async function loadMessageHistory(chatRef) {
 }
 
 async function handleSendMessage(user, agentApiUrl, agentPrompt, selectedAgentId, selectedChatId) {
-    // ... (o conteúdo desta função permanece o mesmo da versão anterior) ...
+    const messageInput = document.getElementById('message-input');
+    const sendBtn = document.getElementById('send-btn');
+    const messageText = messageInput.value.trim();
+    if (messageText.length === 0) return;
+
+    addMessage(messageText, 'user');
+    messageInput.value = '';
+    sendBtn.disabled = true;
+
+    const typingIndicator = addMessage('A pensar...', 'agent-typing');
+
+    try {
+        const idToken = await user.getIdToken();
+        const finalPrompt = `${agentPrompt}\n\n...${messageText}`;
+
+        const response = await fetch(agentApiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+            body: JSON.stringify({
+                mensagem: finalPrompt,
+                agentId: selectedAgentId,
+                chatId: selectedChatId
+            })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'O servidor respondeu com um erro.');
+        }
+
+        const data = await response.json();
+        if (typingIndicator && typingIndicator.parentNode) {
+            typingIndicator.parentNode.removeChild(typingIndicator);
+        }
+        addMessage(data.resposta, 'agent');
+
+    } catch (error) {
+        console.error("Erro ao enviar mensagem:", error);
+        if(typingIndicator && typingIndicator.parentNode) {
+            typingIndicator.parentNode.removeChild(typingIndicator);
+        }
+        addMessage(`Desculpe, ocorreu um erro: ${error.message}`, 'agent-error');
+    } finally {
+        sendBtn.disabled = false;
+        messageInput.focus();
+    }
 }
 
 function addMessage(text, type) {
-    // ... (o conteúdo desta função permanece o mesmo da versão anterior) ...
+    const chatMessages = document.getElementById('chat-messages');
+    const messageElement = document.createElement('div');
+    const messageClass = (type === 'agent-typing') ? 'agent-typing-message' : `${type}-message`;
+    messageElement.classList.add('message', messageClass);
+    messageElement.textContent = text;
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return messageElement;
 }
