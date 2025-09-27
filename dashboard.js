@@ -1,16 +1,14 @@
-// dashboard.js - VERSÃO FINAL COM HISTÓRICO
+// dashboard.js - VERSÃO COM BOTÃO DE EXCLUIR
 
 auth.onAuthStateChanged(user => {
     if (user) {
-        // Agora chamamos as duas funções para carregar tudo
         loadUserAgents(user);
-        loadChatHistory(user); // NOVA FUNÇÃO
+        loadChatHistory(user);
     } else {
         window.location.href = 'index.html';
     }
 });
 
-// Esta função continua igual, para criar NOVAS conversas
 async function loadUserAgents(user) {
     const agentListDiv = document.getElementById('agent-list');
     try {
@@ -62,11 +60,9 @@ async function loadUserAgents(user) {
     }
 }
 
-// ===== NOVA FUNÇÃO PARA CARREGAR O HISTÓRICO =====
 async function loadChatHistory(user) {
     const historyListDiv = document.getElementById('history-list');
     try {
-        // Busca a subcoleção 'chats' do usuário, ordenada pela mais recente
         const chatsRef = db.collection('users').doc(user.uid).collection('chats');
         const querySnapshot = await chatsRef.orderBy('dataCriacao', 'desc').get();
 
@@ -75,32 +71,23 @@ async function loadChatHistory(user) {
             return;
         }
 
-        historyListDiv.innerHTML = ''; // Limpa a mensagem "A carregar..."
+        historyListDiv.innerHTML = '';
 
         querySnapshot.forEach(doc => {
             const chatData = doc.data();
             const chatId = doc.id;
 
-            const historyButton = document.createElement('button');
-            // Usamos o título que foi salvo ao criar a conversa
-            historyButton.textContent = chatData.titulo || 'Conversa sem título';
-            historyButton.classList.add('agent-button'); // Reutilizamos o mesmo estilo
-            historyButton.style.backgroundColor = '#7f8c8d'; // Cor diferente para o histórico
+            const historyItemDiv = document.createElement('div');
+            historyItemDiv.classList.add('history-item');
 
-            // A MÁGICA ACONTECE AQUI:
+            const historyButton = document.createElement('button');
+            historyButton.textContent = chatData.titulo || 'Conversa sem título';
+            historyButton.classList.add('agent-button');
             historyButton.onclick = () => {
-                // Salva os IDs da conversa selecionada no localStorage
                 localStorage.setItem('selectedAgentId', chatData.agentId);
                 localStorage.setItem('selectedChatId', chatId);
-                // Leva o usuário para a página de chat
                 window.location.href = 'agente.html';
             };
 
-            historyListDiv.appendChild(historyButton);
-        });
-
-    } catch (error) {
-        console.error("Erro ao carregar histórico de conversas:", error);
-        historyListDiv.innerHTML = '<p>Ocorreu um erro ao carregar seu histórico.</p>';
-    }
-}
+            const deleteButton = document.createElement('button');
+            deleteButton.innerHTML = '&#12
