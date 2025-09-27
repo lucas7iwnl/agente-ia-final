@@ -1,4 +1,4 @@
-// admin.js - LÓGICA DE GESTÃO DE AGENTES
+// admin.js - LÓGICA COMPLETA DE GESTÃO DE AGENTES
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -15,8 +15,6 @@ async function checkAdminStatus(user) {
 
         if (userDoc.exists && userDoc.data().isAdmin === true) {
             document.getElementById('admin-container').style.display = 'block';
-            document.getElementById('access-denied').style.display = 'none';
-            // Inicia a lógica principal do painel admin
             initializeAdminPanel();
         } else {
             throw new Error("Permissões insuficientes.");
@@ -35,9 +33,16 @@ function initializeAdminPanel() {
     const formContainer = document.getElementById('agent-form-container');
     const cancelBtn = document.getElementById('cancel-btn');
     const agentForm = document.getElementById('agent-form');
+    const formTitle = document.getElementById('form-title');
+    const agentIdInput = document.getElementById('agent-id-input');
+    const agentNameInput = document.getElementById('agent-name-input');
+    const agentPromptInput = document.getElementById('agent-prompt-input');
     
     // Mostra o formulário para criar um novo agente
     showFormBtn.addEventListener('click', () => {
+        agentForm.reset();
+        agentIdInput.value = '';
+        formTitle.textContent = 'Criar Novo Agente';
         formContainer.style.display = 'block';
         showFormBtn.style.display = 'none';
     });
@@ -46,14 +51,15 @@ function initializeAdminPanel() {
     cancelBtn.addEventListener('click', () => {
         formContainer.style.display = 'none';
         showFormBtn.style.display = 'block';
-        agentForm.reset(); // Limpa o formulário
+        agentForm.reset();
     });
 
-    // Lida com o envio do formulário para criar/salvar agente
+    // Lida com o envio do formulário para CRIAR ou ATUALIZAR
     agentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const agentName = document.getElementById('agent-name-input').value;
-        const agentPrompt = document.getElementById('agent-prompt-input').value;
+        const agentId = agentIdInput.value;
+        const agentName = agentNameInput.value;
+        const agentPrompt = agentPromptInput.value;
         
         if (!agentName || !agentPrompt) {
             alert('Nome e Prompt são obrigatórios.');
@@ -61,17 +67,21 @@ function initializeAdminPanel() {
         }
 
         try {
-            // Cria um novo documento na coleção 'agents'
-            await db.collection('agents').add({
-                name: agentName,
-                prompt: agentPrompt
-            });
+            if (agentId) {
+                // Se tem ID, estamos a EDITAR
+                const agentRef = db.collection('agents').doc(agentId);
+                await agentRef.update({ name: agentName, prompt: agentPrompt });
+                alert('Agente atualizado com sucesso!');
+            } else {
+                // Se não tem ID, estamos a CRIAR
+                await db.collection('agents').add({ name: agentName, prompt: agentPrompt });
+                alert('Agente criado com sucesso!');
+            }
             
-            alert('Agente criado com sucesso!');
             agentForm.reset();
             formContainer.style.display = 'none';
             showFormBtn.style.display = 'block';
-            loadAdminAgents(); // Recarrega a lista de agentes
+            loadAdminAgents(); // Recarrega a lista
         } catch (error) {
             console.error("Erro ao salvar agente:", error);
             alert("Não foi possível salvar o agente.");
@@ -90,30 +100,49 @@ async function loadAdminAgents() {
             return;
         }
 
-        agentListDiv.innerHTML = ''; // Limpa a lista
+        agentListDiv.innerHTML = '';
         querySnapshot.forEach(doc => {
             const agent = doc.data();
             const agentId = doc.id;
             
             const agentElement = document.createElement('div');
-            agentElement.classList.add('history-item'); // Reutilizando um estilo
+            agentElement.classList.add('history-item');
             agentElement.innerHTML = `
                 <p style="flex-grow: 1; margin: 0;"><strong>${agent.name}</strong></p>
-                <button class="edit-agent-btn" data-id="${agentId}">Editar</button>
+                <button class="edit-agent-btn" data-id="${agentId}" data-name="${agent.name}" data-prompt="${agent.prompt}">Editar</button>
                 <button class="delete-agent-btn" data-id="${agentId}" style="background-color: #c0392b;">Excluir</button>
             `;
             agentListDiv.appendChild(agentElement);
         });
 
-        // Adicionar lógica para os botões de excluir e editar no futuro
+        // Adiciona a lógica para os botões de EXCLUIR
         document.querySelectorAll('.delete-agent-btn').forEach(button => {
             button.addEventListener('click', async (e) => {
                 const agentId = e.target.dataset.id;
-                if(confirm(`Tem a certeza que quer excluir o agente com ID: ${agentId}?`)) {
+                if(confirm(`Tem a certeza que quer excluir o agente?`)) {
                     await db.collection('agents').doc(agentId).delete();
                     alert('Agente excluído!');
-                    loadAdminAgents(); // Recarrega a lista
+                    loadAdminAgents();
                 }
+            });
+        });
+
+        // Adiciona a lógica para os botões de EDITAR
+        document.querySelectorAll('.edit-agent-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const agentId = e.target.dataset.id;
+                const agentName = e.target.dataset.name;
+                const agentPrompt = e.target.dataset.prompt;
+
+                // Preenche o formulário com os dados do agente
+                document.getElementById('form-title').textContent = 'Editar Agente';
+                document.getElementById('agent-id-input').value = agentId;
+                document.getElementById('agent-name-input').value = agentName;
+                document.getElementById('agent-prompt-input').value = agentPrompt;
+
+                // Mostra o formulário
+                document.getElementById('agent-form-container').style.display = 'block';
+                document.getElementById('show-form-btn').style.display = 'none';
             });
         });
         
