@@ -1,4 +1,4 @@
-// Conteúdo completo e corrigido para o arquivo agente.js
+// Conteúdo completo e final para o arquivo agente.js
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -76,7 +76,7 @@ async function initializeChat(user) {
         const messageText = messageInput.value.trim();
         if (messageText.length === 0) return;
 
-        addMessage(messageText, 'user', false); // Adiciona na tela, mas o backend salvará
+        addMessage(messageText, 'user', false);
         messageInput.value = '';
         sendBtn.disabled = true;
 
@@ -86,13 +86,15 @@ async function initializeChat(user) {
             const idToken = await user.getIdToken();
             const finalPrompt = `${agentPrompt}\n\nAQUI ESTÁ A MENSAGEM DO UTILIZADOR:\n\n---\n\n${messageText}`;
 
+            // ADICIONADO PARA DEPURAÇÃO: Esta linha irá mostrar no console exatamente o que está sendo enviado.
+            console.log("DADOS A SEREM ENVIADOS:", { mensagem: finalPrompt, agentId: selectedAgentId });
+
             const response = await fetch(agentApiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${idToken}`
                 },
-                // LINHA CORRIGIDA:
                 body: JSON.stringify({ mensagem: finalPrompt, agentId: selectedAgentId })
             });
 
@@ -104,7 +106,7 @@ async function initializeChat(user) {
             const data = await response.json();
             
             chatMessages.removeChild(typingIndicator);
-            addMessage(data.resposta, 'agent', false); // Adiciona na tela, pois o backend já salvou
+            addMessage(data.resposta, 'agent', false);
 
         } catch (error) {
             console.error("Erro capturado:", error.message);
