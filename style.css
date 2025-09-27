@@ -88,7 +88,6 @@ button:disabled { background: #bdc3c7; cursor: not-allowed; }
 
 .agent-button { margin-top: 15px; }
 
-/* ESTILOS PARA O BOTÃO DE ADMIN */
 #admin-panel-btn {
     width: auto;
     padding: 8px 15px;
@@ -99,7 +98,6 @@ button:disabled { background: #bdc3c7; cursor: not-allowed; }
     background-color: var(--admin-hover-color);
 }
 
-/* ESTILOS DO HISTÓRICO */
 .history-item { display: flex; align-items: center; gap: 10px; }
 .history-item .agent-button { flex-grow: 1; margin-top: 0; background-color: var(--history-color); }
 .delete-btn {

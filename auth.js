@@ -1,6 +1,5 @@
-// auth.js - VERSÃO CORRIGIDA
+// auth.js - VERSÃO CORRIGIDA SEM ERRO DE SINTAXE
 
-// A sua configuração do Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDHVQd_To0ihQzbxcX2_zUJ9pnh3snhR5M",
     authDomain: "plataforma-agenteis-ia.firebaseapp.com",
