@@ -1,4 +1,4 @@
-// agente.js - VERSÃO COMPLETA E CORRIGIDA
+// agente.js - VERSÃO COMPLETA COM LÓGICA DE CRÉDITOS
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -26,10 +26,20 @@ async function initializeChat(user) {
     }
     
     chatRef = db.collection('users').doc(user.uid).collection('chats').doc(selectedChatId);
-
     const agentApiUrl = 'https://meu-agente-ia-229126335565.southamerica-east1.run.app/meuAgenteIA';
 
     try {
+        // VERIFICAÇÃO INICIAL DE CRÉDITOS
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            if (userData.tipoDeAcesso === 'creditos' && userData.creditosRestantes <= 0) {
+                messageInput.placeholder = 'Seus créditos acabaram. Recarregue para continuar.';
+                messageInput.disabled = true;
+                sendBtn.disabled = true;
+            }
+        }
+
         const agentRef = db.collection('agents').doc(selectedAgentId);
         const agentDoc = await agentRef.get();
         if (!agentDoc.exists) throw new Error('Agente não encontrado.');
@@ -96,6 +106,10 @@ async function handleSendMessage(user, agentApiUrl, agentPrompt, selectedAgentId
             })
         });
 
+        if (response.status === 402) {
+            throw new Error('Créditos esgotados.');
+        }
+
         if (!response.ok) {
             const errorData = await response.json();
             throw new Error(errorData.error || 'O servidor respondeu com um erro.');
@@ -113,9 +127,16 @@ async function handleSendMessage(user, agentApiUrl, agentPrompt, selectedAgentId
             typingIndicator.parentNode.removeChild(typingIndicator);
         }
         addMessage(`Desculpe, ocorreu um erro: ${error.message}`, 'agent-error');
+        if (error.message === 'Créditos esgotados.') {
+            messageInput.placeholder = 'Seus créditos acabaram. Recarregue para continuar.';
+            messageInput.disabled = true;
+            sendBtn.disabled = true;
+        }
     } finally {
-        sendBtn.disabled = false;
-        messageInput.focus();
+        if (messageInput.disabled === false) {
+           sendBtn.disabled = false;
+           messageInput.focus();
+        }
     }
 }
 

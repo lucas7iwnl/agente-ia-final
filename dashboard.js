@@ -1,26 +1,54 @@
-// dashboard.js - VERSÃO FINAL E COMPLETA
+// dashboard.js - VERSÃO COMPLETA COM EXIBIÇÃO DE CRÉDITOS
 
 auth.onAuthStateChanged(user => {
     if (user) {
-        loadUserAgents(user);
-        loadChatHistory(user);
+        loadDashboardData(user);
     } else {
         window.location.href = 'index.html';
     }
 });
 
-async function loadUserAgents(user) {
+async function loadDashboardData(user) {
     const agentListDiv = document.getElementById('agent-list');
+    const historyListDiv = document.getElementById('history-list');
+    const creditDisplay = document.getElementById('credit-display');
+
     try {
         const userRef = db.collection('users').doc(user.uid);
         const userDoc = await userRef.get();
 
-        if (!userDoc.exists || !userDoc.data().agentesPermitidos || userDoc.data().agentesPermitidos.length === 0) {
+        if (!userDoc.exists) {
+            agentListDiv.innerHTML = '<p>Usuário não encontrado no banco de dados.</p>';
+            return;
+        }
+
+        const userData = userDoc.data();
+
+        // LÓGICA PARA EXIBIR CRÉDITOS
+        if (userData.tipoDeAcesso === 'ilimitado') {
+            creditDisplay.textContent = 'Acesso: Ilimitado';
+        } else if (userData.tipoDeAcesso === 'creditos') {
+            creditDisplay.textContent = `Créditos Restantes: ${userData.creditosRestantes}`;
+        }
+
+        loadUserAgents(user, userData, agentListDiv);
+        loadChatHistory(user, historyListDiv);
+
+    } catch (error) {
+        console.error("Erro ao carregar dados do dashboard:", error);
+        creditDisplay.textContent = "Erro ao carregar créditos.";
+        agentListDiv.innerHTML = '<p>Ocorreu um erro ao carregar seus dados.</p>';
+    }
+}
+
+async function loadUserAgents(user, userData, agentListDiv) {
+    try {
+        if (!userData.agentesPermitidos || userData.agentesPermitidos.length === 0) {
             agentListDiv.innerHTML = '<p>Você ainda não tem acesso a nenhum agente.</p>';
             return;
         }
 
-        const permittedAgentIds = userDoc.data().agentesPermitidos;
+        const permittedAgentIds = userData.agentesPermitidos;
         agentListDiv.innerHTML = '';
 
         for (const agentId of permittedAgentIds) {
@@ -45,7 +73,6 @@ async function loadUserAgents(user) {
                         localStorage.setItem('selectedAgentId', agentId);
                         localStorage.setItem('selectedChatId', newChatRef.id);
                         window.location.href = 'agente.html';
-
                     } catch (error) {
                         console.error("Erro ao criar nova conversa:", error);
                         alert("Não foi possível iniciar uma nova conversa.");
@@ -60,8 +87,7 @@ async function loadUserAgents(user) {
     }
 }
 
-async function loadChatHistory(user) {
-    const historyListDiv = document.getElementById('history-list');
+async function loadChatHistory(user, historyListDiv) {
     try {
         const chatsRef = db.collection('users').doc(user.uid).collection('chats');
         const querySnapshot = await chatsRef.orderBy('dataCriacao', 'desc').get();
@@ -76,13 +102,13 @@ async function loadChatHistory(user) {
         querySnapshot.forEach(doc => {
             const chatData = doc.data();
             const chatId = doc.id;
-
             const historyItemDiv = document.createElement('div');
             historyItemDiv.classList.add('history-item');
 
             const historyButton = document.createElement('button');
             historyButton.textContent = chatData.titulo || 'Conversa sem título';
             historyButton.classList.add('agent-button');
+            historyButton.style.backgroundColor = '#7f8c8d';
             historyButton.onclick = () => {
                 localStorage.setItem('selectedAgentId', chatData.agentId);
                 localStorage.setItem('selectedChatId', chatId);

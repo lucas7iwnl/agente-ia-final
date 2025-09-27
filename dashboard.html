@@ -9,20 +9,23 @@
 <body>
     <div class="container">
         <header class="dashboard-header">
-            <h1>Sua Área de Agentes</h1>
+            <div>
+                <h1>Sua Área de Agentes</h1>
+                <p id="credit-display" style="margin: 0; color: #7f8c8d;">A carregar créditos...</p>
+            </div>
             <button id="logout-btn">Sair</button>
         </header>
         <main>
-    <h2>Criar Nova Conversa</h2>
-    <div id="agent-list">
-        <p>A carregar seus agentes...</p>
-    </div>
+            <h2>Criar Nova Conversa</h2>
+            <div id="agent-list">
+                <p>A carregar seus agentes...</p>
+            </div>
 
-    <h2 style="margin-top: 40px;">Histórico de Conversas</h2>
-    <div id="history-list">
-        <p>A carregar seu histórico...</p>
-    </div>
-</main>
+            <h2 style="margin-top: 40px;">Histórico de Conversas</h2>
+            <div id="history-list">
+                <p>A carregar seu histórico...</p>
+            </div>
+        </main>
     </div>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
