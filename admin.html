@@ -24,10 +24,32 @@
                 <button id="show-form-btn" style="width: auto;">+ Criar Novo Agente</button>
             </div>
             <div id="agent-list-admin"><p>A carregar agentes...</p></div>
+
             <div id="agent-form-container" style="display: none; margin-top: 30px; border-top: 1px solid #ecf0f1; padding-top: 20px;">
-                </div>
+                <h3 id="form-title">Criar Novo Agente</h3>
+                <form id="agent-form">
+                    <input type="hidden" id="agent-id-input">
+                    <div class="form-group">
+                        <label for="agent-name-input">Nome do Agente</label>
+                        <input type="text" id="agent-name-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="agent-prompt-input">Prompt Mestre</label>
+                        <textarea id="agent-prompt-input" rows="10" style="width: 100%; font-family: inherit; font-size: 14px; padding: 10px; border-radius: 8px; border: 1px solid #ccc;"></textarea>
+                    </div>
+                    <button type="submit" id="save-agent-btn">Salvar Agente</button>
+                    <button type="button" id="cancel-btn" style="background-color: #7f8c8d; margin-top: 10px;">Cancelar</button>
+                </form>
+            </div>
             </main>
     </div>
+
+    <div id="access-denied" style="display: none; text-align: center;">
+        <h1>Acesso Negado</h1>
+        <p>Você não tem permissão para aceder a esta página.</p>
+        <a href="dashboard.html" style="text-decoration: none;"><button style="max-width: 200px;">Voltar ao Dashboard</button></a>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
