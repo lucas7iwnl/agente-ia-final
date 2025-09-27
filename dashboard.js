@@ -1,4 +1,4 @@
-// dashboard.js - VERSÃO COMPLETA COM BOTÃO ADMIN CONDICIONAL
+// dashboard.js - VERSÃO COMPLETA E CORRIGIDA
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -30,7 +30,6 @@ async function loadDashboardData(user) {
             creditDisplay.textContent = `Créditos Restantes: ${userData.creditosRestantes}`;
         }
 
-        // LÓGICA PARA MOSTRAR O BOTÃO ADMIN
         if (userData.isAdmin === true) {
             const adminLinkContainer = document.getElementById('admin-link-container');
             const adminButton = document.createElement('button');

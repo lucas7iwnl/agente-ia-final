@@ -1,4 +1,4 @@
-// agente.js - VERSÃO COMPLETA COM LÓGICA DE CRÉDITOS
+// agente.js - VERSÃO COMPLETA E CORRIGIDA
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -29,7 +29,6 @@ async function initializeChat(user) {
     const agentApiUrl = 'https://meu-agente-ia-229126335565.southamerica-east1.run.app/meuAgenteIA';
 
     try {
-        // VERIFICAÇÃO INICIAL DE CRÉDITOS
         const userDoc = await db.collection('users').doc(user.uid).get();
         if (userDoc.exists) {
             const userData = userDoc.data();
