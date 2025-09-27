@@ -1,6 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
 
-:root { /* Paleta de Cores */
+:root {
     --primary-color: #3498db;
     --secondary-color: #2c3e50;
     --background-color: #f4f7f9;
@@ -10,6 +10,8 @@
     --error-color: #e74c3c;
     --history-color: #7f8c8d;
     --delete-color: #c0392b;
+    --admin-color: #f39c12;
+    --admin-hover-color: #e67e22;
 }
 
 body {
@@ -42,36 +44,12 @@ header {
     padding-bottom: 20px;
 }
 
-header h1 {
-    color: var(--secondary-color);
-    margin: 0;
-}
+header h1 { color: var(--secondary-color); margin: 0; }
+header p { color: #7f8c8d; font-weight: 600; }
 
-header p {
-    color: #7f8c8d;
-    font-weight: 600;
-}
-
-.form-group {
-    margin-bottom: 20px;
-    text-align: left;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 600;
-    color: #555;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 16px;
-    box-sizing: border-box;
-}
+.form-group { margin-bottom: 20px; text-align: left; }
+.form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #555; }
+.form-group input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; box-sizing: border-box; }
 
 button {
     display: block;
@@ -91,19 +69,8 @@ button:hover:not(:disabled) {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
 }
-
-button:disabled {
-    background: #bdc3c7;
-    cursor: not-allowed;
-}
-
-.error-text {
-    color: var(--error-color);
-    text-align: center;
-    margin-top: 15px;
-    font-weight: 600;
-    height: 20px;
-}
+button:disabled { background: #bdc3c7; cursor: not-allowed; }
+.error-text { color: var(--error-color); text-align: center; margin-top: 15px; font-weight: 600; height: 20px; }
 
 .dashboard-header {
     display: flex;
@@ -119,111 +86,22 @@ button:disabled {
     background-color: var(--error-color);
 }
 
-.agent-button {
-    margin-top: 15px;
-}
+.agent-button { margin-top: 15px; }
 
-.chat-container {
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 40px);
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: var(--card-background);
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-}
-
-.chat-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    border-bottom: 1px solid var(--light-gray);
-}
-
-.chat-header h1 {
-    font-size: 1.2em;
-    margin: 0;
-}
-
-#back-dashboard-btn {
+/* ESTILOS PARA O BOTÃO DE ADMIN */
+#admin-panel-btn {
     width: auto;
     padding: 8px 15px;
     font-size: 14px;
+    background-color: var(--admin-color);
+}
+#admin-panel-btn:hover {
+    background-color: var(--admin-hover-color);
 }
 
-.chat-messages {
-    flex-grow: 1;
-    padding: 20px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.message {
-    padding: 10px 15px;
-    border-radius: 18px;
-    max-width: 75%;
-    line-height: 1.5;
-    white-space: pre-wrap;
-}
-
-.user-message {
-    background-color: var(--primary-color);
-    color: white;
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
-}
-
-.agent-message, .agent-typing-message, .agent-error-message {
-    background-color: var(--light-gray);
-    color: var(--text-color);
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
-}
-
-.agent-error-message {
-    background-color: #f5c6cb;
-}
-
-.chat-input-area {
-    display: flex;
-    padding: 15px;
-    border-top: 1px solid var(--light-gray);
-}
-
-.chat-input-area textarea {
-    flex-grow: 1;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    padding: 10px;
-    font-size: 1em;
-    resize: none;
-    margin: 0 10px 0 0;
-}
-
-.chat-input-area button {
-    width: auto;
-    padding: 10px 20px;
-    font-size: 1em;
-    align-self: stretch;
-}
-
-.history-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.history-item .agent-button {
-    flex-grow: 1;
-    margin-top: 0;
-    background-color: var(--history-color);
-}
-
+/* ESTILOS DO HISTÓRICO */
+.history-item { display: flex; align-items: center; gap: 10px; }
+.history-item .agent-button { flex-grow: 1; margin-top: 0; background-color: var(--history-color); }
 .delete-btn {
     background-color: transparent;
     border: none;
@@ -234,9 +112,4 @@ button:disabled {
     width: auto;
     box-shadow: none;
 }
-
-.delete-btn:hover {
-    color: var(--error-color);
-    transform: scale(1.1);
-    box-shadow: none;
-}
+.delete-btn:hover { color: var(--error-color); transform: scale(1.1); box-shadow: none; }

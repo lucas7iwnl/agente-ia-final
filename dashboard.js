@@ -1,4 +1,4 @@
-// dashboard.js - VERSÃO COMPLETA COM EXIBIÇÃO DE CRÉDITOS
+// dashboard.js - VERSÃO COMPLETA COM BOTÃO ADMIN CONDICIONAL
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -24,11 +24,22 @@ async function loadDashboardData(user) {
 
         const userData = userDoc.data();
 
-        // LÓGICA PARA EXIBIR CRÉDITOS
         if (userData.tipoDeAcesso === 'ilimitado') {
             creditDisplay.textContent = 'Acesso: Ilimitado';
         } else if (userData.tipoDeAcesso === 'creditos') {
             creditDisplay.textContent = `Créditos Restantes: ${userData.creditosRestantes}`;
+        }
+
+        // LÓGICA PARA MOSTRAR O BOTÃO ADMIN
+        if (userData.isAdmin === true) {
+            const adminLinkContainer = document.getElementById('admin-link-container');
+            const adminButton = document.createElement('button');
+            adminButton.textContent = 'Painel Admin';
+            adminButton.id = 'admin-panel-btn';
+            adminButton.onclick = () => {
+                window.location.href = 'admin.html';
+            };
+            adminLinkContainer.appendChild(adminButton);
         }
 
         loadUserAgents(user, userData, agentListDiv);
@@ -47,20 +58,16 @@ async function loadUserAgents(user, userData, agentListDiv) {
             agentListDiv.innerHTML = '<p>Você ainda não tem acesso a nenhum agente.</p>';
             return;
         }
-
         const permittedAgentIds = userData.agentesPermitidos;
         agentListDiv.innerHTML = '';
-
         for (const agentId of permittedAgentIds) {
             const agentRef = db.collection('agents').doc(agentId);
             const agentDoc = await agentRef.get();
-
             if (agentDoc.exists) {
                 const agentData = agentDoc.data();
                 const agentButton = document.createElement('button');
                 agentButton.textContent = `Nova Conversa com ${agentData.name}`;
                 agentButton.classList.add('agent-button');
-                
                 agentButton.onclick = async () => {
                     try {
                         const newChatRef = await db.collection('users').doc(user.uid).collection('chats').add({
@@ -69,7 +76,6 @@ async function loadUserAgents(user, userData, agentListDiv) {
                             titulo: `Conversa com ${agentData.name}`,
                             dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
                         });
-                        
                         localStorage.setItem('selectedAgentId', agentId);
                         localStorage.setItem('selectedChatId', newChatRef.id);
                         window.location.href = 'agente.html';
@@ -91,20 +97,16 @@ async function loadChatHistory(user, historyListDiv) {
     try {
         const chatsRef = db.collection('users').doc(user.uid).collection('chats');
         const querySnapshot = await chatsRef.orderBy('dataCriacao', 'desc').get();
-
         if (querySnapshot.empty) {
             historyListDiv.innerHTML = '<p>Nenhuma conversa anterior encontrada.</p>';
             return;
         }
-
         historyListDiv.innerHTML = '';
-
         querySnapshot.forEach(doc => {
             const chatData = doc.data();
             const chatId = doc.id;
             const historyItemDiv = document.createElement('div');
             historyItemDiv.classList.add('history-item');
-
             const historyButton = document.createElement('button');
             historyButton.textContent = chatData.titulo || 'Conversa sem título';
             historyButton.classList.add('agent-button');
@@ -114,7 +116,6 @@ async function loadChatHistory(user, historyListDiv) {
                 localStorage.setItem('selectedChatId', chatId);
                 window.location.href = 'agente.html';
             };
-
             const deleteButton = document.createElement('button');
             deleteButton.innerHTML = '&#128465;';
             deleteButton.classList.add('delete-btn');
@@ -123,12 +124,10 @@ async function loadChatHistory(user, historyListDiv) {
                 event.stopPropagation();
                 deleteChat(user, chatId, historyItemDiv);
             };
-
             historyItemDiv.appendChild(historyButton);
             historyItemDiv.appendChild(deleteButton);
             historyListDiv.appendChild(historyItemDiv);
         });
-
     } catch (error) {
         console.error("Erro ao carregar histórico de conversas:", error);
         historyListDiv.innerHTML = '<p>Ocorreu um erro ao carregar seu histórico.</p>';
