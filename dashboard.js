@@ -1,4 +1,4 @@
-// dashboard.js - VERSÃO COMPLETA E CORRIGIDA
+// dashboard.js - VERSÃO FINAL E COMPLETA
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -90,7 +90,7 @@ async function loadChatHistory(user) {
             };
 
             const deleteButton = document.createElement('button');
-            deleteButton.innerHTML = '&#128465;'; // Ícone de lixeira
+            deleteButton.innerHTML = '&#128465;';
             deleteButton.classList.add('delete-btn');
             deleteButton.title = 'Excluir conversa';
             deleteButton.onclick = (event) => {
