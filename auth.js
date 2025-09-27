@@ -1,9 +1,11 @@
+// auth.js - VERSÃO CORRIGIDA
+
 // A sua configuração do Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDHVQd_To0ihQzbxcX2_zUJ9pnh3snhR5M",
     authDomain: "plataforma-agenteis-ia.firebaseapp.com",
     projectId: "plataforma-agenteis-ia",
-    storageBucket: "plataforma-agenteis-ia.firebasestorage.app",
+    storageBucket: "plataforma-agenteis-ia.appspot.com",
     messagingSenderId: "466485628265",
     appId: "1:466485628265:web:8969c2878e0f6b500b81f8"
 };
@@ -36,7 +38,9 @@ if (document.getElementById('login-btn')) {
 if (document.getElementById('logout-btn')) {
     const logoutButton = document.getElementById('logout-btn');
     logoutButton.addEventListener('click', () => {
+        // CORREÇÃO: Limpa ambos os IDs ao sair
         localStorage.removeItem('selectedAgentId');
+        localStorage.removeItem('selectedChatId');
         auth.signOut().then(() => window.location.href = 'index.html');
     });
 }

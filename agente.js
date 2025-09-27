@@ -1,4 +1,4 @@
-// agente.js - VERSÃO ATUALIZADA PARA CHATS INDIVIDUAIS
+// agente.js - VERSÃO COMPLETA E CORRIGIDA
 
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -17,7 +17,7 @@ async function initializeChat(user) {
     let chatRef = null;
 
     const selectedAgentId = localStorage.getItem('selectedAgentId');
-    const selectedChatId = localStorage.getItem('selectedChatId'); // NOVO!
+    const selectedChatId = localStorage.getItem('selectedChatId');
 
     if (!selectedAgentId || !selectedChatId) {
         alert("Nenhuma conversa selecionada. A redirecionar...");
@@ -25,10 +25,10 @@ async function initializeChat(user) {
         return;
     }
     
-    // NOVO CAMINHO PARA ACESSAR AS MENSAGENS:
     chatRef = db.collection('users').doc(user.uid).collection('chats').doc(selectedChatId);
 
-    const agentApiUrl = 'URL_DA_SUA_CLOUD_FUNCTION'; // Substitua pela sua URL
+    // !!! IMPORTANTE: Verifique se esta é a URL correta da sua Cloud Function !!!
+    const agentApiUrl = 'https://meu-agente-ia-229126335565.southamerica-east1.run.app/meuAgenteIA';
 
     try {
         const agentRef = db.collection('agents').doc(selectedAgentId);
@@ -46,7 +46,7 @@ async function initializeChat(user) {
         }
 
     } catch (error) {
-        console.error(error);
+        console.error("Erro na inicialização:", error);
         agentNameTitle.textContent = "Erro ao carregar";
     }
 
@@ -88,7 +88,7 @@ async function handleSendMessage(user, agentApiUrl, agentPrompt, selectedAgentId
             body: JSON.stringify({
                 mensagem: finalPrompt,
                 agentId: selectedAgentId,
-                chatId: selectedChatId // ENVIA O ID DO CHAT PARA O BACKEND
+                chatId: selectedChatId
             })
         });
 
@@ -102,12 +102,24 @@ async function handleSendMessage(user, agentApiUrl, agentPrompt, selectedAgentId
         addMessage(data.resposta, 'agent');
 
     } catch (error) {
-        // ... (código de tratamento de erro) ...
+        console.error("Erro ao enviar mensagem:", error);
+        if(typingIndicator && typingIndicator.parentNode) {
+            typingIndicator.parentNode.removeChild(typingIndicator);
+        }
+        addMessage(`Desculpe, ocorreu um erro: ${error.message}`, 'agent-error');
     } finally {
         sendBtn.disabled = false;
+        messageInput.focus();
     }
 }
 
 function addMessage(text, type) {
-    // ... (código da função addMessage, sem alterações) ...
+    const chatMessages = document.getElementById('chat-messages');
+    const messageElement = document.createElement('div');
+    const messageClass = (type === 'agent-typing') ? 'agent-typing-message' : `${type}-message`;
+    messageElement.classList.add('message', messageClass);
+    messageElement.textContent = text;
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return messageElement;
 }
